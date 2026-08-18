@@ -1,18 +1,3 @@
-# Consultoria Atendimentos
-
-API para cadastro de consultores e registro de atendimentos, desenvolvida como
-trabalho da AV01.
-
-## Requisitos atendidos
-
-- Arquitetura em MVC
-- Pattern Repository
-- Pattern DTO
-- Pattern Mapper
-- Endpoints GET, POST, PUT e DELETE
-- Persistência via ORM
-- Documentação via Swagger
-
 ## Stack
 
 - Python 3.12
