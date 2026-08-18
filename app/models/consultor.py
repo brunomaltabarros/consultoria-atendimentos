@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from app.database import Base
+from sqlalchemy.orm import relationship
 
 class Consultor(Base):
     __tablename__ = "consultores"
@@ -11,3 +12,5 @@ class Consultor(Base):
     telefone = Column(String, nullable=False)
     bio = Column(String, nullable=True)
     especialidade = Column(String, nullable=True)
+
+    atendimentos = relationship("Atendimento", back_populates="consultor")
