@@ -9,7 +9,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code=404,
             content={"erro": exc.message})
     
-    @app.exception_handler(ConflictExeption)
+    @app.exception_handler(ConflictException)
     def handle_conflict(request: Request, exc: ConflictException) -> JSONResponse:
         return JSONResponse(
             status_code= 409,
