@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.exceptions import ConflictException, NotFoundException
+from app.exceptions.exceptions import ConflictException, NotFoundException
 from app.models.consultor import Consultor
 
 class ConsultorRepository:
@@ -28,7 +28,7 @@ class ConsultorRepository:
         self.db.refresh(consultor)
         return consultor
 
-    def delete(self, consultor: Consultor) -> Consultor:
+    def delete(self, consultor: Consultor) -> None:
             self.db.delete(consultor)
             self._commit()
 
