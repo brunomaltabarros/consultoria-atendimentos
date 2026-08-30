@@ -21,10 +21,10 @@ class AtendimentoRepository:
             raise NotFoundException(f"Atendimento {atendimento_id} não encontrado")
         return atendimento
 
-    def ensure_consultor_exists(self, atendimento_id: int) -> None:
-            existe = self.db.query(Consultor.id).filter (Consultor.id == consultor_id).first()
-            if existe is None:
-                raise NotFoundException(f"Consultor {consultor_id} não encontrado")
+    def ensure_consultor_exists(self, consultor_id: int) -> None:
+        existe = self.db.query(Consultor.id).filter(Consultor.id == consultor_id).first()
+        if existe is None:
+            raise NotFoundException(f"Consultor {consultor_id} não encontrado")
     
     def create(self, atendimento: Atendimento) -> Atendimento:
          self.db.add(atendimento)
@@ -42,8 +42,8 @@ class AtendimentoRepository:
         self._commit()
     
     def _commit(self) -> None:
-         try:
-              self.db.commit()
-         except IntegrityError as e:
-              self.db.rollback()
-              raise ConflictException("Não foi possível salvar o agendamento") from exc
+        try:
+            self.db.commit()
+        except IntegrityError as exc:
+            self.db.rollback()
+            raise ConflictException("Não foi possível salvar o atendimento") from exc

@@ -9,3 +9,9 @@ class ConsultorMapper:
     @staticmethod
     def to_model(dto: ConsultorDTO) -> Consultor:
         return Consultor(**dto.model_dump())
+    
+    @staticmethod
+    def update_model(consultor: Consultor, dto: ConsultorDTO) -> Consultor:
+        for campo, valor in dto.model_dump().items():
+            setattr(consultor, campo, valor)
+        return consultor
