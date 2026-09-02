@@ -1,10 +1,18 @@
 from fastapi import FastAPI
-from app.database import Base, engine
+
 from app import models
+from app.controllers import atendimento_controller, consultor_controller
+from app.database import Base, engine
+from app.exceptions.handlers import register_exception_handlers
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="My API")
+app = FastAPI(title="Portal do Credenciamento")
+
+register_exception_handlers(app)
+
+app .include_router(atendimento_controller.router)
+app .include_router(consultor_controller.router)
 
 @app.get("/")
 def root():
