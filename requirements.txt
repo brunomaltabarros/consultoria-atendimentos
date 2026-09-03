@@ -1,3 +1,6 @@
+#framework da api
 fastapi
+#servidor que roda a aplicação (usado com "uvicorn app.main:app --reload")
 uvicorn[standard]
+#mapeia as classes Consultor e Atendimento para o sqlite
 sqlalchemy
