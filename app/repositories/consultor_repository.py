@@ -34,7 +34,7 @@ class ConsultorRepositorio:
 
     def _salvar(self) -> None:
         try:
-            self.sessao.salvar()
+            self.sessao.commit()
         except IntegrityError as erro:
             self.sessao.rollback()
             raise ExcecaoConflito("CPF ou e-mail já cadastrado para outro consultor") from erro

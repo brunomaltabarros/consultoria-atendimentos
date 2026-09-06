@@ -9,7 +9,7 @@ from app.repositories.consultor_repository import ConsultorRepositorio
 rotas = APIRouter(prefix="/consultores", tags=["Consultores"])
 
 @rotas.get("", response_model=list[ConsultorRespostaDTO])
-def listar_consultores(skip: int = 0, limit: int = 100, db: Session = Depends(obter_sessao)):
+def listar_consultores(skip: int = 0, limit: int = 100, sessao: Session = Depends(obter_sessao)):
     consultores = ConsultorRepositorio(sessao).listar(skip=skip, limit=limit)
     return [ConsultorMapper.para_dto_resposta(consultor) for consultor in consultores]
 
@@ -28,7 +28,7 @@ def criar_consultor(dto: ConsultorDTO, sessao: Session = Depends(obter_sessao)):
 def atualizar_consultor(consultor_id: int, dto: ConsultorDTO, sessao: Session = Depends(obter_sessao)):
     repositorio = ConsultorRepositorio(sessao)
     consultor = repositorio.buscar_por_id(consultor_id)
-    consultor = ConsultorMapper.update_model(consultor, dto)
+    consultor = ConsultorMapper.atualizar_modelo(consultor, dto)
     consultor = repositorio.atualizar(consultor)
     return ConsultorMapper.para_dto_resposta(consultor)
 
