@@ -8,6 +8,6 @@ class ConsultorDTO(BaseModel):
     bio: str | None = None
     especialidade: str | None = None
 
-class ConsultorResponseDTO(ConsultorDTO):
+class ConsultorRespostaDTO(ConsultorDTO):
     id: int
     model_config = ConfigDict(from_attributes=True)

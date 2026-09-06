@@ -1,22 +1,22 @@
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "sqlite:///./consultoria.db"
+URL_BANCO = "sqlite:///./consultoria.db"
 
-engine = create_engine(DATABASE_URL, connect_args={'check_same_thread': False})
+engine = create_engine(URL_BANCO, connect_args={'check_same_thread': False})
 
 @event.listens_for(engine, "connect")
-def habilitar_foreign_keys(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
+def habilitar_foreign_keys(conexao, registro_conexao):
+    cursor = conexao.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
-SessionLocal = sessionmaker (autocommit=False, autoflush=False, bind=engine)
+SessaoLocal = sessionmaker (autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-def get_db():
-    db = SessionLocal()
+def obter_sessao():
+    sessao = SessaoLocal()
     try:
-        yield db
+        yield sessao
     finally:
-        db.close()
+        sessao.close()

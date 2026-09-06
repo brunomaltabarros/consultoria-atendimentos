@@ -1,17 +1,17 @@
 from app.models.atendimento import Atendimento
-from app.dtos.atendimento_dto import AtendimentoDTO, AtendimentoResponseDTO
+from app.dtos.atendimento_dto import AtendimentoDTO, AtendimentoRespostaDTO
 
 class AtendimentoMapper: 
     @staticmethod
-    def to_response_dto(atendimento: Atendimento) -> AtendimentoResponseDTO:
-        return AtendimentoResponseDTO.model_validate(atendimento)
+    def para_dto_resposta(atendimento: Atendimento) -> AtendimentoRespostaDTO:
+        return AtendimentoRespostaDTO.model_validate(atendimento)
 
     @staticmethod
-    def to_model(dto: AtendimentoDTO) -> Atendimento:
+    def para_modelo(dto: AtendimentoDTO) -> Atendimento:
         return Atendimento(**dto.model_dump())
 
     @staticmethod
-    def update_model(atendimento: Atendimento, dto: AtendimentoDTO) -> Atendimento:
+    def atualizar_modelo(atendimento: Atendimento, dto: AtendimentoDTO) -> Atendimento:
         for campo, valor in dto.model_dump().items():
             setattr(atendimento, campo, valor)
         return atendimento

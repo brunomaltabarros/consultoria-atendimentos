@@ -8,6 +8,6 @@ class AtendimentoDTO(BaseModel):
     descricao: str 
     tipo: str
 
-class AtendimentoResponseDTO(AtendimentoDTO):
+class AtendimentoRespostaDTO(AtendimentoDTO):
     id:int
     model_config = ConfigDict(from_attributes=True)

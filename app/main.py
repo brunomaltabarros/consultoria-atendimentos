@@ -3,17 +3,17 @@ from fastapi import FastAPI
 from app import models
 from app.controllers import atendimento_controller, consultor_controller
 from app.database import Base, engine
-from app.exceptions.handlers import register_exception_handlers
+from app.exceptions.handlers import registrar_tratadores_excecao
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Portal do Credenciamento")
 
-register_exception_handlers(app)
+registrar_tratadores_excecao(app)
 
-app .include_router(atendimento_controller.router)
-app .include_router(consultor_controller.router)
+app .include_router(atendimento_controller.rotas)
+app .include_router(consultor_controller.rotas)
 
 @app.get("/")
 def root():
-    return {"message": "Hello, World!"}
+    return {"mensagem": "Olá, Mundo!"}

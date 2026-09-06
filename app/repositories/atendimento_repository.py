@@ -1,49 +1,49 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.exceptions.exceptions import ConflictException, NotFoundException
+from app.exceptions.exceptions import ExcecaoConflito, ExcecaoNaoEncontrado
 from app.models.atendimento import Atendimento
 from app.models.consultor import Consultor
 
-class AtendimentoRepository:
-    def __init__(self, db: Session):
-        self.db = db
-    
-    def get_all(self, consultor_id: int | None = None, skip: int = 0, limit: int = 100) -> list[Atendimento]:
-        query = self.db.query(Atendimento)
+class AtendimentoRepositorio:
+    def __init__(self, sessao: Session):
+        self.sessao = sessao
+
+    def listar(self, consultor_id: int | None = None, skip: int = 0, limit: int = 100) -> list[Atendimento]:
+        query = self.sessao.query(Atendimento)
         if consultor_id is not None:
             query = query.filter(Atendimento.consultor_id == consultor_id)
         return query.offset(skip).limit(limit).all()
 
-    def get_by_id(self, atendimento_id: int) -> Atendimento:
-        atendimento = self.db.query(Atendimento).filter(Atendimento.id == atendimento_id).first()
+    def buscar_por_id(self, atendimento_id: int) -> Atendimento:
+        atendimento = self.sessao.query(Atendimento).filter(Atendimento.id == atendimento_id).first()
         if atendimento is None:
-            raise NotFoundException(f"Atendimento {atendimento_id} não encontrado")
+            raise ExcecaoNaoEncontrado(f"Atendimento {atendimento_id} não encontrado")
         return atendimento
 
-    def ensure_consultor_exists(self, consultor_id: int) -> None:
-        existe = self.db.query(Consultor.id).filter(Consultor.id == consultor_id).first()
+    def validar_consultor_existe(self, consultor_id: int) -> None:
+        existe = self.sessao.query(Consultor.id).filter(Consultor.id == consultor_id).first()
         if existe is None:
-            raise NotFoundException(f"Consultor {consultor_id} não encontrado")
-    
-    def create(self, atendimento: Atendimento) -> Atendimento:
-         self.db.add(atendimento)
-         self._commit()
-         self.db.refresh(atendimento)
+            raise ExcecaoNaoEncontrado(f"Consultor {consultor_id} não encontrado")
+
+    def criar(self, atendimento: Atendimento) -> Atendimento:
+         self.sessao.add(atendimento)
+         self._salvar()
+         self.sessao.refresh(atendimento)
          return atendimento
 
-    def update(self, atendimento: Atendimento) -> Atendimento:
-             self._commit()
-             self.db.refresh(atendimento)
+    def atualizar(self, atendimento: Atendimento) -> Atendimento:
+             self._salvar()
+             self.sessao.refresh(atendimento)
              return atendimento
 
-    def delete(self, atendimento: Atendimento) -> None:
-        self.db.delete(atendimento)
-        self._commit()
-    
-    def _commit(self) -> None:
+    def remover(self, atendimento: Atendimento) -> None:
+        self.sessao.delete(atendimento)
+        self._salvar()
+
+    def _salvar(self) -> None:
         try:
-            self.db.commit()
-        except IntegrityError as exc:
-            self.db.rollback()
-            raise ConflictException("Não foi possível salvar o atendimento") from exc
+            self.sessao.salvar()
+        except IntegrityError as erro:
+            self.sessao.rollback()
+            raise ExcecaoConflito("Não foi possível salvar o atendimento") from erro

@@ -1,10 +1,10 @@
-class AppException(Exception):
-    def __init__(self, message: str):
-        self.message = message
-        super().__init__(self.message)
+class ExcecaoAplicacao(Exception):
+    def __init__(self, messagem: str):
+        self.messagem = messagem
+        super().__init__(self.messagem)
 
-class NotFoundException(AppException):
+class ExcecaoNaoEncontrado(ExcecaoAplicacao):
     pass
 
-class ConflictException(AppException):
+class ExcecaoConflito(ExcecaoAplicacao):
     pass
