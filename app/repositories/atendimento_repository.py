@@ -43,7 +43,7 @@ class AtendimentoRepositorio:
 
     def _salvar(self) -> None:
         try:
-            self.sessao.salvar()
+            self.sessao.commit()
         except IntegrityError as erro:
             self.sessao.rollback()
             raise ExcecaoConflito("Não foi possível salvar o atendimento") from erro
