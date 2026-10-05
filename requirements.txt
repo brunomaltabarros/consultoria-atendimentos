@@ -6,3 +6,7 @@ uvicorn[standard]
 sqlalchemy
 #migrações do schema do banco (equivalente ao flyway)
 alembic
+#gera e valida o hash das senhas
+bcrypt
+#cria e valaida os tokens jwt
+PyJWT
