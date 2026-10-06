@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from app.exceptions.exceptions import ExcecaoAplicacao, ExcecaoConflito, ExcecaoNaoEncontrado
+from app.exceptions.exceptions import ExcecaoAplicacao, ExcecaoConflito, ExcecaoNaoEncontrado, ExcecaoNaoAutorizado
 
 def registrar_tratadores_excecao(app: FastAPI) -> None:
     @app.exception_handler(ExcecaoNaoEncontrado)
@@ -13,6 +13,12 @@ def registrar_tratadores_excecao(app: FastAPI) -> None:
     def tratar_conflito(requisicao: Request, erro: ExcecaoConflito) -> JSONResponse:
         return JSONResponse(
             status_code= 409,
+            content={"erro": erro.messagem})
+
+    @app.exception_handler(ExcecaoNaoAutorizado)
+    def tratar_nao_autorizado(requisicao: Request, erro: ExcecaoNaoAutorizado) -> JSONResponse:
+        return JSONResponse(
+            status_code=401,
             content={"erro": erro.messagem})
     
     @app.exception_handler(ExcecaoAplicacao)

@@ -8,3 +8,6 @@ class ExcecaoNaoEncontrado(ExcecaoAplicacao):
 
 class ExcecaoConflito(ExcecaoAplicacao):
     pass
+
+class ExcecaoNaoAutorizado(ExcecaoAplicacao):
+    pass
