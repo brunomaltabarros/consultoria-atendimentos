@@ -10,3 +10,5 @@ alembic
 bcrypt
 #cria e valaida os tokens jwt
 PyJWT
+#valida o formato de e-mail nos DTOs
+email-validator

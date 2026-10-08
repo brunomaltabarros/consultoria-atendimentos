@@ -21,11 +21,11 @@ class UsuarioRepositorio:
         return self.sessao.query(Usuario).filter(Usuario.email == email).first()
 
     def criar(self, usuario: Usuario) -> Usuario:
-        try:
-            self.sessao.add(usuario)
-            self._salvar()
-            self.sessao.refresh(usuario)
-            return usuario
+        self.sessao.add(usuario)
+        self._salvar()
+        self.sessao.refresh(usuario)
+        return usuario
+
     def _salvar(self) -> None:
         try:
             self.sessao.commit()
