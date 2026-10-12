@@ -1,4 +1,4 @@
-from app.dtos.usuario_dto import UsuarioRegistroDTO, UsuarioRespostaDTO
+from app.dtos.usuario_dto import UsuarioRegistroDTO, UsuarioRespostaDTO, UsuarioAtualizacaoDTO
 from app.models.usuario import Usuario
 from app.security.senha import gerar_hash_senha
 
@@ -15,4 +15,9 @@ class UsuarioMapper:
             senha_hash=gerar_hash_senha(dto.senha),
             ativo=True,
         )
-    
+
+    @staticmethod
+    def atualizar_modelo(usuario: Usuario, dto: UsuarioAtualizacaoDTO) -> Usuario:
+        usuario.nome = dto.nome
+        usuario.email = dto.email
+        return usuario

@@ -19,3 +19,7 @@ class UsuarioRespostaDTO(BaseModel):
 class TokenDTO(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class UsuarioAtualizacaoDTO(BaseModel):
+    nome: str = Field(min_length=3, max_length=120)
+    email: EmailStr

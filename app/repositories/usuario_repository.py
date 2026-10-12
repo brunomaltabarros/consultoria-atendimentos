@@ -26,6 +26,15 @@ class UsuarioRepositorio:
         self.sessao.refresh(usuario)
         return usuario
 
+    def atualizar(self, usuario: Usuario) -> Usuario:
+        self._salvar()
+        self.sessao.refresh(usuario)
+        return usuario
+
+    def remover(self, usuario: Usuario) -> None:
+        self.sessao.delete(usuario)
+        return usuario
+
     def _salvar(self) -> None:
         try:
             self.sessao.commit()
