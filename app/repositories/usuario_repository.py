@@ -33,7 +33,7 @@ class UsuarioRepositorio:
 
     def remover(self, usuario: Usuario) -> None:
         self.sessao.delete(usuario)
-        return usuario
+        self._salvar()
 
     def _salvar(self) -> None:
         try:

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app import models
-from app.controllers import atendimento_controller, auth_controller, consultor_controller
+from app.controllers import atendimento_controller, auth_controller, consultor_controller, usuario_controller
 from app.exceptions.handlers import registrar_tratadores_excecao
 
 app = FastAPI(title="Portal do Credenciamento")
@@ -11,6 +11,7 @@ registrar_tratadores_excecao(app)
 app .include_router(atendimento_controller.rotas)
 app .include_router(auth_controller.rotas)
 app .include_router(consultor_controller.rotas)
+app .include_router(usuario_controller.rotas)
 
 @app.get("/")
 def raiz():

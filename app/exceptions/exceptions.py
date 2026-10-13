@@ -11,3 +11,6 @@ class ExcecaoConflito(ExcecaoAplicacao):
 
 class ExcecaoNaoAutorizado(ExcecaoAplicacao):
     pass
+
+class ExcecaoProibido(ExcecaoAplicacao):
+    pass
