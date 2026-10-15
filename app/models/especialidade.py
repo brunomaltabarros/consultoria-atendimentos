@@ -13,7 +13,7 @@ class Especialidade(Base):
     __tablename__ = "especialidades"
 
     id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String, unique=True, index=True)
+    nome = Column(String, nullable=False, unique=True, index=True)
     descricao = Column(String, nullable = True)
 
     consultores = relationship(
