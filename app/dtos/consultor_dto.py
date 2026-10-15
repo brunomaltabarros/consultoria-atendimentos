@@ -6,7 +6,6 @@ class ConsultorDTO(BaseModel):
     email: str
     telefone: str
     bio: str | None = None
-    especialidade: str | None = None
 
 class ConsultorRespostaDTO(ConsultorDTO):
     id: int
