@@ -1,7 +1,8 @@
+import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-URL_BANCO = "sqlite:///./consultoria.db"
+URL_BANCO = os.getenv("URL_BANCO", "sqlite:///./consultoria.db")
 
 engine = create_engine(URL_BANCO, connect_args={'check_same_thread': False})
 
