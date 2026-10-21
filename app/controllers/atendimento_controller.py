@@ -2,13 +2,19 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import obter_sessao
+from app.dtos.respostas_comuns import RESPOSTA_404
 from app.dtos.atendimento_dto import AtendimentoDTO, AtendimentoRespostaDTO
 from app.mappers.atendimento_mapper import AtendimentoMapper
 from app.repositories.atendimento_repository import AtendimentoRepositorio
 
 rotas = APIRouter(prefix="/atendimentos", tags=["Atendimentos"])
 
-@rotas.get("", response_model=list[AtendimentoRespostaDTO])
+@rotas.get(
+    "",
+    response_model=list[AtendimentoRespostaDTO],
+    summary="Listar atendimentos",
+    description="Devolve a lista paginada de atendimentos. Pode ser filtrada por consultor_id.",
+)
 def listar_atendimentos(
     consultor_id: int | None = None,
     skip: int = 0,
@@ -18,12 +24,25 @@ def listar_atendimentos(
     atendimentos = AtendimentoRepositorio(sessao).listar(consultor_id=consultor_id, skip=skip, limit=limit)
     return [AtendimentoMapper.para_dto_resposta(atendimento) for atendimento in atendimentos]
 
-@rotas.get("/{atendimento_id}", response_model=AtendimentoRespostaDTO)
+@rotas.get(
+    "/{atendimento_id}",
+    response_model=AtendimentoRespostaDTO,
+    summary="Obter atendimento por ID",
+    description="Devolve um atendimento específico.",
+    responses={**RESPOSTA_404},
+)
 def obter_atendimento(atendimento_id: int, sessao: Session = Depends(obter_sessao)):
     atendimento = AtendimentoRepositorio(sessao).buscar_por_id(atendimento_id)
     return AtendimentoMapper.para_dto_resposta(atendimento)
 
-@rotas.post("", response_model=AtendimentoRespostaDTO, status_code=status.HTTP_201_CREATED)
+@rotas.post(
+    "",
+    response_model=AtendimentoRespostaDTO,
+    status_code=status.HTTP_201_CREATED,
+    summary="Registrar atendimento",
+    description="Cria um atendimento vinculado a um consultor existente.",
+    responses={**RESPOSTA_404},
+)
 def criar_atendimento(dto: AtendimentoDTO, sessao: Session = Depends(obter_sessao)):
     repositorio = AtendimentoRepositorio(sessao)
     repositorio.validar_consultor_existe(dto.consultor_id)
@@ -31,7 +50,13 @@ def criar_atendimento(dto: AtendimentoDTO, sessao: Session = Depends(obter_sessa
     atendimento = repositorio.criar(atendimento)
     return AtendimentoMapper.para_dto_resposta(atendimento)
 
-@rotas.put("/{atendimento_id}", response_model=AtendimentoRespostaDTO)
+@rotas.put(
+    "/{atendimento_id}",
+    response_model=AtendimentoRespostaDTO,
+    summary="Atualizar atendimento",
+    description="Atualiza um atendimento. O consultor informado precisa existir.",
+    responses={**RESPOSTA_404},
+)
 def atualizar_atendimento(atendimento_id: int, dto: AtendimentoDTO, sessao: Session = Depends(obter_sessao)):
     repositorio = AtendimentoRepositorio(sessao)
     repositorio.validar_consultor_existe(dto.consultor_id)
@@ -40,7 +65,13 @@ def atualizar_atendimento(atendimento_id: int, dto: AtendimentoDTO, sessao: Sess
     atendimento = repositorio.atualizar(atendimento)
     return AtendimentoMapper.para_dto_resposta(atendimento)
 
-@rotas.delete("/{atendimento_id}", status_code=status.HTTP_204_NO_CONTENT)
+@rotas.delete(
+    "/{atendimento_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remover atendimento",
+    description="Remove um atendimento do histórico.",
+    responses={**RESPOSTA_404},
+)
 def remover_atendimento(atendimento_id: int, sessao: Session = Depends(obter_sessao)):
     repositorio = AtendimentoRepositorio(sessao)
     atendimento = repositorio.buscar_por_id(atendimento_id)
