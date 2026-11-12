@@ -16,7 +16,7 @@ class ConsultorServico:
         return self.repositorio.buscar_por_id(consultor_id)
 
     def criar(self, dto: ConsultorDTO) -> Consultor:
-        return self.repositorio.criar(ConsultorMapper.dto_para_modelo(dto))
+        return self.repositorio.criar(ConsultorMapper.para_modelo(dto))
 
     def atualizar(self, consultor_id: int, dto: ConsultorDTO) -> Consultor:
         consultor = self.repositorio.buscar_por_id(consultor_id)
