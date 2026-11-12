@@ -5,7 +5,7 @@ from app.database import obter_sessao
 from app.dtos.respostas_comuns import RESPOSTA_404
 from app.dtos.consultor_dto import ConsultorDTO, ConsultorRespostaDTO
 from app.mappers.consultor_mapper import ConsultorMapper
-from app.repositories.consultor_repository import ConsultorRepositorio
+from app.services.consultor_service import ConsultorServico
 
 rotas = APIRouter(prefix="/consultores", tags=["Consultores"])
 
@@ -16,7 +16,7 @@ rotas = APIRouter(prefix="/consultores", tags=["Consultores"])
     description="Devolve a lista paginada de consultores, com suas especialidades.",
 )
 def listar_consultores(skip: int = 0, limit: int = 100, sessao: Session = Depends(obter_sessao)):
-    consultores = ConsultorRepositorio(sessao).listar(skip=skip, limit=limit)
+    consultores = ConsultorServico(sessao).listar(skip=skip, limit=limit)
     return [ConsultorMapper.para_dto_resposta(consultor) for consultor in consultores]
 
 @rotas.get(
@@ -27,7 +27,7 @@ def listar_consultores(skip: int = 0, limit: int = 100, sessao: Session = Depend
     responses={**RESPOSTA_404},
 )
 def obter_consultor(consultor_id: int, sessao: Session = Depends(obter_sessao)):
-    consultor = ConsultorRepositorio(sessao).buscar_por_id(consultor_id)
+    consultor = ConsultorServico(sessao).buscar_por_id(consultor_id)
     return ConsultorMapper.para_dto_resposta(consultor)
 
 @rotas.post(
@@ -38,8 +38,7 @@ def obter_consultor(consultor_id: int, sessao: Session = Depends(obter_sessao)):
     description="Cria um consultor. O e-mail e o CPF precisam ser únicos.",
 )
 def criar_consultor(dto: ConsultorDTO, sessao: Session = Depends(obter_sessao)):
-    consultor = ConsultorMapper.para_modelo(dto)
-    consultor = ConsultorRepositorio(sessao).criar(consultor)
+    consultor = ConsultorServico(sessao).criar(dto)
     return ConsultorMapper.para_dto_resposta(consultor)
 
 @rotas.put(
@@ -50,10 +49,7 @@ def criar_consultor(dto: ConsultorDTO, sessao: Session = Depends(obter_sessao)):
     responses={**RESPOSTA_404},
 )
 def atualizar_consultor(consultor_id: int, dto: ConsultorDTO, sessao: Session = Depends(obter_sessao)):
-    repositorio = ConsultorRepositorio(sessao)
-    consultor = repositorio.buscar_por_id(consultor_id)
-    consultor = ConsultorMapper.atualizar_modelo(consultor, dto)
-    consultor = repositorio.atualizar(consultor)
+    consultor = ConsultorServico(sessao).atualizar(consultor_id, dto)
     return ConsultorMapper.para_dto_resposta(consultor)
 
 @rotas.delete(
@@ -64,6 +60,4 @@ def atualizar_consultor(consultor_id: int, dto: ConsultorDTO, sessao: Session = 
     responses={**RESPOSTA_404},
 )
 def remover_consultor(consultor_id: int, sessao: Session = Depends(obter_sessao)):
-    repositorio = ConsultorRepositorio(sessao)
-    consultor = repositorio.buscar_por_id(consultor_id)
-    repositorio.remover(consultor)
+    ConsultorServico(sessao).remover(consultor_id)
