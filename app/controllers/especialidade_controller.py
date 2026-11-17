@@ -4,12 +4,10 @@ from sqlalchemy.orm import Session
 from app.database import obter_sessao
 from app.dtos.respostas_comuns import RESPOSTA_401, RESPOSTA_404, RESPOSTA_409
 from app.dtos.especialidade_dto import (EspecialidadeComConsultoresDTO,EspecialidadeDTO,EspecialidadeRespostaDTO,)
-from app.exceptions.exceptions import ExcecaoConflito, ExcecaoNaoEncontrado
 from app.mappers.especialidade_mapper import EspecialidadeMapper
 from app.models.usuario import Usuario
-from app.repositories.consultor_repository import ConsultorRepositorio
-from app.repositories.especialidade_repository import EspecialidadeRepositorio
 from app.security.dependencias import obter_usuario_logado
+from app.services.especialidade_service import EspecialidadeServico
 
 rotas = APIRouter(prefix="/especialidades", tags=["Especialidades"])
 
@@ -20,7 +18,7 @@ rotas = APIRouter(prefix="/especialidades", tags=["Especialidades"])
     description="Devolve a lista paginada de especialidades.",
 )
 def listar_especialidades(skip: int = 0, limit: int = 100, sessao: Session = Depends(obter_sessao)):
-    especialidades = EspecialidadeRepositorio(sessao).listar(skip=skip, limit=limit)
+    especialidades = EspecialidadeServico(sessao).listar(skip=skip, limit=limit)
     return [EspecialidadeMapper.para_dto_resposta(e) for e in especialidades]
 
 @rotas.get(
@@ -31,7 +29,7 @@ def listar_especialidades(skip: int = 0, limit: int = 100, sessao: Session = Dep
     responses={**RESPOSTA_404},
 )
 def obter_especialidade(especialidade_id: int, sessao: Session = Depends(obter_sessao)):
-    especialidade = EspecialidadeRepositorio(sessao).buscar_por_id(especialidade_id)
+    especialidade = EspecialidadeServico(sessao).buscar_por_id(especialidade_id)
     return EspecialidadeMapper.para_dto_com_consultores(especialidade)
 
 @rotas.post(
@@ -47,10 +45,7 @@ def criar_especialidade(
     sessao: Session = Depends(obter_sessao),
     usuario_logado: Usuario = Depends(obter_usuario_logado),
 ):
-    repositorio = EspecialidadeRepositorio(sessao)
-    if repositorio.buscar_por_nome(dto.nome) is not None:
-        raise ExcecaoConflito("Já existe uma especialidade com esse nome")
-    especialidade = repositorio.criar(EspecialidadeMapper.para_modelo(dto))
+    especialidade = EspecialidadeServico(sessao).criar(dto)
     return EspecialidadeMapper.para_dto_resposta(especialidade)
 
 @rotas.put(
@@ -66,13 +61,7 @@ def atualizar_especialidade(
     sessao: Session = Depends(obter_sessao),
     usuario_logado: Usuario = Depends(obter_usuario_logado),
 ):
-    repositorio = EspecialidadeRepositorio(sessao)
-    especialidade = repositorio.buscar_por_id(especialidade_id)
-    existente = repositorio.buscar_por_nome(dto.nome)
-    if existente is not None and existente.id != especialidade_id:
-        raise ExcecaoConflito("Já existe uma especialidade com esse nome")
-    especialidade = EspecialidadeMapper.atualizar_modelo(especialidade, dto)
-    especialidade = repositorio.atualizar(especialidade)
+    especialidade = EspecialidadeServico(sessao).atualizar(especialidade_id, dto)
     return EspecialidadeMapper.para_dto_resposta(especialidade)
 
 @rotas.delete(
@@ -87,9 +76,7 @@ def remover_especialidade(
     sessao: Session = Depends(obter_sessao),
     usuario_logado: Usuario = Depends(obter_usuario_logado),
 ):
-    repositorio = EspecialidadeRepositorio(sessao)
-    especialidade = repositorio.buscar_por_id(especialidade_id)
-    repositorio.remover(especialidade)
+    EspecialidadeServico(sessao).remover(especialidade_id)
 
 @rotas.post(
     "/{especialidade_id}/consultores/{consultor_id}",
@@ -98,14 +85,13 @@ def remover_especialidade(
     description="Cria o vínculo n:n entre consultor e especialidade. Exige autenticação.",
     responses={**RESPOSTA_401, **RESPOSTA_404, **RESPOSTA_409},
 )
-def vincular_consultor(especialidade_id: int,consultor_id: int,sessao: Session = Depends(obter_sessao),usuario_logado: Usuario = Depends(obter_usuario_logado),):
-    repositorio = EspecialidadeRepositorio(sessao)
-    especialidade = repositorio.buscar_por_id(especialidade_id)
-    consultor = ConsultorRepositorio(sessao).buscar_por_id(consultor_id)
-    if consultor in especialidade.consultores:
-        raise ExcecaoConflito(f"Consultor {consultor_id} já possui essa especialidade")
-    especialidade.consultores.append(consultor)
-    especialidade = repositorio.atualizar(especialidade)
+def vincular_consultor(
+    especialidade_id: int,
+    consultor_id: int,
+    sessao: Session = Depends(obter_sessao),
+    usuario_logado: Usuario = Depends(obter_usuario_logado),
+):
+    especialidade = EspecialidadeServico(sessao).vincular_consultor(especialidade_id, consultor_id)
     return EspecialidadeMapper.para_dto_com_consultores(especialidade)
 
 @rotas.delete(
@@ -115,11 +101,10 @@ def vincular_consultor(especialidade_id: int,consultor_id: int,sessao: Session =
     description="Remove o vínculo entre consultor e especialidade. Exige autenticação.",
     responses={**RESPOSTA_401, **RESPOSTA_404},
 )
-def desvincular_consultor(especialidade_id: int,consultor_id: int,sessao: Session = Depends(obter_sessao),usuario_logado: Usuario = Depends(obter_usuario_logado),):
-    repositorio = EspecialidadeRepositorio(sessao)
-    especialidade = repositorio.buscar_por_id(especialidade_id)
-    consultor = ConsultorRepositorio(sessao).buscar_por_id(consultor_id)
-    if consultor not in especialidade.consultores:
-        raise ExcecaoNaoEncontrado(f"Consultor {consultor_id} não possui essa especialidade")
-    especialidade.consultores.remove(consultor)
-    repositorio.atualizar(especialidade)
+def desvincular_consultor(
+    especialidade_id: int,
+    consultor_id: int,
+    sessao: Session = Depends(obter_sessao),
+    usuario_logado: Usuario = Depends(obter_usuario_logado),
+):
+    EspecialidadeServico(sessao).desvincular_consultor(especialidade_id, consultor_id)
