@@ -4,17 +4,12 @@ from sqlalchemy.orm import Session
 from app.database import obter_sessao
 from app.dtos.respostas_comuns import RESPOSTA_401, RESPOSTA_403, RESPOSTA_404, RESPOSTA_409
 from app.dtos.usuario_dto import UsuarioAtualizacaoDTO, UsuarioRespostaDTO
-from app.exceptions.exceptions import ExcecaoConflito, ExcecaoProibido
 from app.mappers.usuario_mapper import UsuarioMapper
 from app.models.usuario import Usuario
-from app.repositories.usuario_repository import UsuarioRepositorio
 from app.security.dependencias import obter_usuario_logado
+from app.services.usuario_service import UsuarioServico
 
 rotas = APIRouter(prefix="/usuarios", tags=["Usuários"])
-
-def garantir_proprio_usuario(usuario_id: int, usuario_logado: Usuario) -> None:
-    if usuario_id != usuario_logado.id:
-        raise ExcecaoProibido("Você só pode alterar seus próprios dados.")
 
 @rotas.get(
     "/",
@@ -29,7 +24,7 @@ def listar_usuarios(
     sessao: Session = Depends(obter_sessao),
     usuario_logado: Usuario = Depends(obter_usuario_logado),
 ):
-    usuarios = UsuarioRepositorio(sessao).listar(skip=skip, limit=limit)
+    usuarios = UsuarioServico(sessao).listar(skip=skip, limit=limit)
     return [UsuarioMapper.para_dto_resposta(usuario) for usuario in usuarios]
 
 @rotas.get(
@@ -44,7 +39,7 @@ def obter_usuario(
     sessao: Session = Depends(obter_sessao),
     usuario_logado: Usuario = Depends(obter_usuario_logado),
 ):
-    usuario = UsuarioRepositorio(sessao).buscar_por_id(usuario_id)
+    usuario = UsuarioServico(sessao).buscar_por_id(usuario_id)
     return UsuarioMapper.para_dto_resposta(usuario)
 
 @rotas.put(
@@ -60,14 +55,7 @@ def atualizar_usuario(
     sessao: Session = Depends(obter_sessao),
     usuario_logado: Usuario = Depends(obter_usuario_logado),
 ):
-    garantir_proprio_usuario(usuario_id, usuario_logado)
-    repositorio = UsuarioRepositorio(sessao)
-    usuario = repositorio.buscar_por_id(usuario_id)
-    existente = repositorio.buscar_por_email(usuario_dto.email)
-    if existente is not None and existente.id != usuario_id:
-        raise ExcecaoConflito("O email fornecido já está em uso por outro usuário.")
-    usuario = UsuarioMapper.atualizar_modelo(usuario, usuario_dto)
-    usuario = repositorio.atualizar(usuario)
+    usuario = UsuarioServico(sessao).atualizar(usuario_id, usuario_dto, usuario_logado)
     return UsuarioMapper.para_dto_resposta(usuario)
 
 @rotas.delete(
@@ -82,7 +70,4 @@ def remover_usuario(
     sessao: Session = Depends(obter_sessao),
     usuario_logado: Usuario = Depends(obter_usuario_logado),
 ):
-    garantir_proprio_usuario(usuario_id, usuario_logado)
-    repositorio = UsuarioRepositorio(sessao)
-    usuario = repositorio.buscar_por_id(usuario_id)
-    repositorio.remover(usuario)
+    UsuarioServico(sessao).remover(usuario_id, usuario_logado)
