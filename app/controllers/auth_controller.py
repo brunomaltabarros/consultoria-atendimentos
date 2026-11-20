@@ -4,13 +4,10 @@ from sqlalchemy.orm import Session
 from app.database import obter_sessao
 from app.dtos.respostas_comuns import RESPOSTA_401, RESPOSTA_401_CREDENCIAIS, RESPOSTA_409
 from app.dtos.usuario_dto import TokenDTO, UsuarioLoginDTO, UsuarioRegistroDTO, UsuarioRespostaDTO
-from app.exceptions.exceptions import ExcecaoConflito, ExcecaoNaoAutorizado
 from app.mappers.usuario_mapper import UsuarioMapper
 from app.models.usuario import Usuario
-from app.repositories.usuario_repository import UsuarioRepositorio
 from app.security.dependencias import obter_usuario_logado
-from app.security.senha import verificar_senha
-from app.security.token import criar_token_acesso
+from app.services.auth_service import AuthServico
 
 rotas = APIRouter(prefix="/auth", tags=["Autenticação"])
 
@@ -23,10 +20,7 @@ rotas = APIRouter(prefix="/auth", tags=["Autenticação"])
     responses={**RESPOSTA_409},
 )
 def registrar(dto: UsuarioRegistroDTO, sessao: Session = Depends(obter_sessao)):
-    repositorio = UsuarioRepositorio(sessao)
-    if repositorio.buscar_por_email(dto.email) is not None:
-        raise ExcecaoConflito("E-mail já cadastrado.")
-    usuario = repositorio.criar(UsuarioMapper.para_modelo(dto))
+    usuario = AuthServico(sessao).registrar(dto)
     return UsuarioMapper.para_dto_resposta(usuario)
 
 @rotas.post(
@@ -37,12 +31,8 @@ def registrar(dto: UsuarioRegistroDTO, sessao: Session = Depends(obter_sessao)):
     responses={**RESPOSTA_401_CREDENCIAIS},
 )
 def login(dto: UsuarioLoginDTO, sessao: Session = Depends(obter_sessao)):
-    usuario = UsuarioRepositorio(sessao).buscar_por_email(dto.email)
-    if usuario is None or not verificar_senha(dto.senha, usuario.senha_hash):
-        raise ExcecaoNaoAutorizado("E-mail ou senha inválidos")
-    if not usuario.ativo:
-        raise ExcecaoNaoAutorizado("Usuário inativo")
-    return TokenDTO(access_token=criar_token_acesso(usuario.id, usuario.email))
+    token = AuthServico(sessao).autenticar(dto)
+    return TokenDTO(access_token=token)
 
 @rotas.get(
     "/eu",
