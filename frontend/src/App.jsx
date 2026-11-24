@@ -1,30 +1,27 @@
-import { useEffect, useState } from "react";
-import { api } from "./api/cliente";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import RotaProtegida from "./componentes/RotaProtegida";
+import ProvedorAutenticacao from "./contexto/ProvedorAutenticacao";
+import Inicio from "./paginas/Inicio";
+import Login from "./paginas/Login";
 
 function App() {
-  const [consultores, setConsultores] = useState([]);
-  const [erro, setErro] = useState(null);
-
-  useEffect(() => {
-    api
-      .buscar("/consultores")
-      .then(setConsultores)
-      .catch((e) => setErro(e.message));
-  }, []);
-
   return (
-    <div>
-      <h1>Teste de conexão com a API</h1>
-      {erro && <p style={{ color: "crimson" }}>Erro: {erro}</p>}
-      <p>{consultores.length} consultor(es) recebidos</p>
-      <ul>
-        {consultores.map((c) => (
-          <li key={c.id}>
-            {c.nome} — {c.email}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ProvedorAutenticacao>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <RotaProtegida>
+                <Inicio />
+              </RotaProtegida>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ProvedorAutenticacao>
   );
 }
 

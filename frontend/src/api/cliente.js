@@ -49,6 +49,10 @@ async function requisitar(caminho, { metodo = "GET", corpo } = {}) {
   const dados = texto ? JSON.parse(texto) : null;
 
   if (!resposta.ok) {
+    if (resposta.status === 401 && token) {
+      localStorage.removeItem("token");
+      window.dispatchEvent(new Event("sessao-expirada"));
+    }
     throw new ErroDaApi(extrairMensagem(dados, resposta.status), resposta.status);
   }
 
