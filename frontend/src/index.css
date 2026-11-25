@@ -116,3 +116,66 @@ button.secundario {
   align-items: center;
   gap: 12px;
 }
+
+h2 {
+  font-size: 1.15rem;
+  margin: 0 0 12px;
+}
+
+button.perigo {
+  background: transparent;
+  color: var(--erro);
+  border: 1px solid var(--borda);
+}
+
+.formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.largo {
+  grid-column: 1 / -1;
+}
+
+.acoes {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borda);
+}
+
+th {
+  font-size: 0.85rem;
+  color: var(--suave);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.botoes {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

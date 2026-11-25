@@ -1,4 +1,5 @@
 import { useAutenticacao } from "../contexto/AutenticacaoContexto";
+import Consultores from "./Consultores";
 
 export default function Inicio() {
   const { usuario, sair } = useAutenticacao();
@@ -12,7 +13,7 @@ export default function Inicio() {
           <button className="secundario" onClick={sair}>Sair</button>
         </div>
       </header>
-      <p>Login funcionando. A tela de consultores entra aqui na próxima etapa.</p>
+      <Consultores />
     </main>
   );
 }

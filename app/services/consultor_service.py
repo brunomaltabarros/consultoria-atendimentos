@@ -4,6 +4,7 @@ from app.dtos.consultor_dto import ConsultorDTO
 from app.mappers.consultor_mapper import ConsultorMapper
 from app.models.consultor import Consultor 
 from app.repositories.consultor_repository import ConsultorRepositorio
+from app.exceptions.exceptions import ExcecaoConflito
 
 class ConsultorServico: 
     def __init__(self, sessao: Session):
@@ -25,4 +26,6 @@ class ConsultorServico:
 
     def remover(self, consultor_id: int) -> None:
         consultor = self.repositorio.buscar_por_id(consultor_id)
+        if consultor.atendimentos:
+            raise ExcecaoConflito("O consultor possui atendimentos registrados e não pode ser removido.")
         self.repositorio.remover(consultor)
